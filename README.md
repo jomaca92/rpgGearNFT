@@ -1,13 +1,5 @@
-## Running React on Repl.it
+# rpgLoot NFT Collection
 
-[React](https://reactjs.org/) is a popular JavaScript library for building user interfaces.
+This is the minting interface for an NFT collection of randomly generated RPG Gear - inspired by the [Loot (for Adventurers)](https://www.lootproject.com/) collection and built based on the Buildspace NFT Collection project.
 
-[Vite](https://vitejs.dev/) is a blazing fast frontend build tool that includes features like Hot Module Reloading (HMR), optimized builds, and TypeScript support out of the box.
-
-Using the two in conjunction is one of the fastest ways to build a web app.
-
-### Getting Started
-- Hit run
-- Edit [App.jsx](#src/App.jsx) and watch it live update!
-
-By default, Replit runs the `dev` script, but you can configure it by changing the `run` field in the `.replit` file.
+The contract "randomly" generates and stores all data on chain at the time of minting. It can mint up to 5 pieces in one transaction, and has a total supply modifiable by the contract owner. You can view the Solidity smart contract [here](https://rinkeby.etherscan.io/address/0xb06621eFCf914fee8595ac7BCf8DF06B4F6a4b0E).
