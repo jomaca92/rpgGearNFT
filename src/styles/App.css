@@ -102,6 +102,10 @@
   color: white;
 }
 
+.text-sm {
+  font-size: 1rem;
+}
+
 .d-flex {
   display: flex;
   flex-direction: row;
@@ -114,6 +118,10 @@
 
 .mb-2 {
   margin-bottom: .5rem;
+}
+
+.mb-5 {
+  margin-bottom: 2rem;
 }
 
 .justify-between {
@@ -139,7 +147,7 @@
   padding: 15px;
   margin:15px;
   flex-grow:1;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   width:85%;
   max-width:400px;

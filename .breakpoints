@@ -3,9 +3,15 @@
     "src/App.jsx": [
       {
         "id": "d0d9aa9d-d08d-4705-a383-607ef9f76517",
-        "line": 43,
-        "version": 4816,
-        "index": 1495
+        "line": 13,
+        "version": 4871,
+        "index": 511
+      },
+      {
+        "id": "c7dfbb8b-cfe6-4084-9acd-6e7b6ed679c6",
+        "line": 67,
+        "version": 5042,
+        "index": 2071
       }
     ]
   }

@@ -10,14 +10,15 @@ const TWITTER_HANDLE = 'jonah_sc';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = '';
 const TOTAL_MINT_COUNT = 50;
-const OPENSEA_URL = `https://testnets.opensea.io/collection/rpggear-v2`
+const OPENSEA_URL = `https://testnets.opensea.io/collection/rpggear-v3`
 const RARIBLE_URL = `https://rinkeby.rarible.com/token/${CONTRACT_ADDRESS}:`
+const EST_GAS = 3500000
 
 const App = () => {
 
   const [currentAccount, setCurrentAccount] = useState("")
   const [minting, setMinting] = useState(false)
-  const [lastMinted, setLastMinted] = useState()
+  const [lastMinted, setLastMinted] = useState([])
   const [mintAmount, setMintAmount] = useState(1)
   const [maxSupply, setMaxSupply] = useState(0)
   const [totalMinted, setTotalMinted] = useState(0)
@@ -50,8 +51,6 @@ const App = () => {
     } else {
       console.log("No authorized account found")
     }
-
-
   }
 
   const connectWallet = async () => {
@@ -107,9 +106,9 @@ const App = () => {
       const signer = provider.getSigner()
       const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, rpgGear.abi, signer)
 
-      connectedContract.on("NewMint", (from, tokenId) => {
-        console.log(from, tokenId.toNumber())
-        setLastMinted(tokenId.toNumber())
+      connectedContract.on("NewMint", (from, tokenIds) => {
+        setLastMinted(tokenIds)
+        getMintInfo()
       })
 
       console.log("Setup event listener!")
@@ -137,7 +136,7 @@ const App = () => {
 
       console.log("Going to pop wallet now to pay gas...")
       setMinting(true)
-      let nftTxn = await connectedContract.mint(mintAmount);
+      let nftTxn = await connectedContract.mint(mintAmount, { gasLimit: EST_GAS * mintAmount});
 
       console.log("Mining...please wait.")
       await nftTxn.wait();
@@ -147,34 +146,39 @@ const App = () => {
 
     } catch (error) {
       console.log(error)
+      setMinting(false)
+      alert(error.message)
     }
   }
 
   // Render Methods
   const renderNotConnectedContainer = () => (
-    <button onClick={connectWallet} className="cta-button connect-wallet-button">
+    <button onClick={connectWallet} className="cta-button connect-wallet-button mb-2">
       Connect to Wallet
     </button>
   );
 
   const renderMintButton = () => (
-    <button onClick={mintNFT} className="cta-button mint-button">
-      Mint NFT
+    <button onClick={mintNFT} className="cta-button mint-button mb-2">
+      Mint!
     </button>
   )
 
   const renderMinting = () => (
-    <div className="d-flex text-white">
+    <div className="d-flex text-white text-sm">
       <div className="mr-2">Minting</div>
       <div className="loader"></div>
     </div>
   )
 
   const renderMinted = () => (
-    <div>
-      <p className="text-white">Minting Complete!</p>
-       <p>👉 <a class="link" target="_blank" href={ RARIBLE_URL + lastMinted }> View on Rarible</a></p>
-    </div>
+      <div>
+        <p className="text-white">Minting Complete!</p>
+        { lastMinted.map( tokenId => (
+          <p key={tokenId.toNumber()}>👉 <a className="link" target="_blank" href={ RARIBLE_URL + tokenId.toNumber() }> View token id #{tokenId.toNumber()} on Rarible</a></p>
+          )
+        )}
+      </div>
   )
 
   useEffect( () => {
@@ -193,19 +197,20 @@ const App = () => {
         </div>
         <div className="body-container flex-column">
           <div className="body-card">
-
-            <div className="d-flex align-items-end">
-              <p className="gradient-text mint-count mr-2" style={{"marginTop":0, "marginBottom":0}}>{totalMinted}/{maxSupply}</p> 
-              <p className="text-white" style={{"marginTop":0, "marginBottom":"5px"}}>
-                Minted
-              </p>
-            </div>
-            <div class="d-flex flex-column">
-              <label className="text-white mb-2"> Mint Amount: <input type="number"  min="1" max="5" value={mintAmount} onChange={e => setMintAmount(e.target.value)} /></label>
-              
-              {currentAccount == "" ? renderNotConnectedContainer() : renderMintButton()}
-              {minting && renderMinting()}
-              {lastMinted && renderMinted()}
+            <div className="d-flex flex-column">
+              <div className="d-flex align-items-end mb-5">
+                <p className="gradient-text mint-count mr-2" style={{"marginTop":0, "marginBottom":0}}>{totalMinted}/{maxSupply}</p> 
+                <p className="text-white" style={{"marginTop":0, "marginBottom":"5px"}}>
+                  Minted
+                </p>
+              </div>
+              <div className="d-flex flex-column">
+                <label className="text-white mb-2"> Amount to Mint: <input type="number"  min="1" max="5" value={mintAmount} onChange={e => setMintAmount(e.target.value)} /></label>
+                
+                {currentAccount == "" ? renderNotConnectedContainer() : renderMintButton()}
+                {minting && renderMinting()}
+                {lastMinted.length > 0 && renderMinted()}
+              </div>
             </div>
             <p>
               <a className="link" target="_blank" href={ OPENSEA_URL }>🌊 View on OpenSea</a>
